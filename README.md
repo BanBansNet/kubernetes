@@ -105,3 +105,34 @@ systemctl restart containerd
 systemctl restart kubelet
 ```
 
+## single node cluster
+
+Poor people edition we want our master node to also schedule pods
+
+```
+kubectl taint nodes --all node-role.kubernetes.io/master-
+kubectl taint nodes --all node-role.kubernetes.io/control-plane-
+```
+
+## ingress controller
+
+not sure if we even need a website
+
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.1/deploy/static/provider/baremetal/deploy.yaml
+```
+
+## run ddnet servers!
+
+When the cluster is healthy do
+
+```
+kubectl apply -f ddnet-pod.yaml
+```
+
+And then connect to your host ip at port 8304
+if you want to change the port edit this line in the ``ddnet-pod.yaml``
+
+```yaml
+        hostPort: 8304
+```
