@@ -50,7 +50,7 @@ and install kubectl on your machine
 Run this in the current repo on your authorized machine
 
 ```
-kubectl apply -f kube-flannel.yml
+kubectl apply -f kube-flannel.yaml
 ```
 
 ## flannel troubleshooting
@@ -59,7 +59,7 @@ For me it didn't pick up the correct ip
 So I had to make sure the node uses the same ip as flannel.
 
 ```
-grep Network kube-flannel.yml # => "Network": "10.244.0.0/16",
+grep Network kube-flannel.yaml # => "Network": "10.244.0.0/16",
 ```
 
 Has to match
