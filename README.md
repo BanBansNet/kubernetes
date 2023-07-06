@@ -98,6 +98,10 @@ if it does not set it to true. If its not there at all generate a full config wi
 containerd config default > /etc/containerd/config.toml
 ```
 
-And then set SystemdCgroup to true.
+And then set SystemdCgroup to true. And then restart containerd and kubelet
 
+```
+systemctl restart containerd
+systemctl restart kubelet
+```
 
