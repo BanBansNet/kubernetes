@@ -17,27 +17,37 @@ kind: ConfigMap
 metadata:
   name: ddnet-autoexec
 ---
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: ddnet
+  name: ddnet-deployment
+  labels:
+    app: ddnet
 spec:
-  containers:
-  - name: ddnet
-    image: chillerdragon/ddnet-mysql:17.1
-    command: ["/ddnet/DDNet-Server", "-f", "/ddnet/config/autoexec.cfg"]
-    imagePullPolicy: Always
-    ports:
-    - containerPort: 8303
-      protocol: UDP
-      hostPort: 8304
-    volumeMounts:
-      - name: config-volume
-        mountPath: /ddnet/config
-  volumes:
-    - name: config-volume
-      configMap:
-        name: ddnet-autoexec
-        items:
-        - key: autoexec.cfg
-          path: autoexec.cfg
+  selector:
+    matchLabels:
+      app: ddnet
+  template:
+    metadata:
+      labels:
+        app: ddnet
+    spec:
+      containers:
+      - name: ddnet
+        image: chillerdragon/ddnet-mysql:17.1
+        command: ["/ddnet/DDNet-Server", "-f", "/ddnet/config/autoexec.cfg"]
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8303
+          protocol: UDP
+          hostPort: 8304
+        volumeMounts:
+          - name: config-volume
+            mountPath: /ddnet/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: ddnet-autoexec
+            items:
+            - key: autoexec.cfg
+              path: autoexec.cfg
