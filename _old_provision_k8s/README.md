@@ -1,4 +1,8 @@
 # kubernetes
+
+> NOTE: I switched to k3s instead since it replaces all this mess with just a single
+> command: ``curl -sfL https://get.k3s.io | sh -``
+
 Getting a cluster running
 
 Using containerd, kubeadm and flannel on debian 12
@@ -127,7 +131,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/cont
 When the cluster is healthy do
 
 ```
-kubectl apply -f ddnet-pod.yaml
+kubectl apply -f ../ddnet-pod.yaml
 ```
 
 And then connect to your host ip at port 8304
