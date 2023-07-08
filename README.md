@@ -16,8 +16,15 @@ curl -sfL https://get.k3s.io | sh -
 ## Run a sample ddnet pod
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/BanBansNet/kubernetes/master/ddnet-pod.yaml
+kubectl apply -f https://raw.githubusercontent.com/BanBansNet/kubernetes/master/pods/ddnet-no-db.yaml
 ```
 
 Then connect to your servers ip on port 8304 using a ddnet/teeworlds client.
+
+## Run servers with mysql database
+
+```bash
+kubectl apply -f mariadb.yaml
+kubectl apply -f ddnet.yaml
+```
 

@@ -1,0 +1,43 @@
+apiVersion: v1
+data:
+  autoexec.cfg: |+
+    # sample mysql ddnet server config
+
+    sv_name "[k8s] BanBansNet GER 1"
+    sv_map "Sunny Side Up"
+
+    password test
+
+    sv_use_sql 1
+    # add_sqlserver s['r'|'w'] s[Database] s[Prefix] s[User] s[Password] s[IP] i[Port] ?i[SetUpDatabase ?]
+    add_sqlserver r bbnet record root secret mariadb 3306
+    add_sqlserver w bbnet record root secret mariadb 3306
+
+kind: ConfigMap
+metadata:
+  name: ddnet-autoexec
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ddnet
+spec:
+  containers:
+  - name: ddnet
+    image: chillerdragon/ddnet-mysql:17.1
+    command: ["/ddnet/DDNet-Server", "-f", "/ddnet/config/autoexec.cfg"]
+    imagePullPolicy: Always
+    ports:
+    - containerPort: 8303
+      protocol: UDP
+      hostPort: 8304
+    volumeMounts:
+      - name: config-volume
+        mountPath: /ddnet/config
+  volumes:
+    - name: config-volume
+      configMap:
+        name: ddnet-autoexec
+        items:
+        - key: autoexec.cfg
+          path: autoexec.cfg
