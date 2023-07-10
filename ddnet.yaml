@@ -4,7 +4,7 @@ data:
     # sample mysql ddnet server config
 
     sv_name "[k8s] BanBansNet GER 1"
-    sv_map "Sunny Side Up"
+    sv_map "ChillDontKill"
 
     password test
 
@@ -44,6 +44,20 @@ spec:
         volumeMounts:
           - name: config-volume
             mountPath: /ddnet/config
+          - name: maps
+            mountPath: /ddnet/maps
+      initContainers:
+      - name: get-maps
+        image: busybox:latest
+        command: ["sh", "-c"]
+        args:
+         - wget -O maps.zip
+           "https://github.com/BanBansNet/bbnet-maps/archive/refs/heads/master.zip";
+           unzip maps.zip;
+           mv bbnet-maps-master/*.map /ddnet/maps/
+        volumeMounts:
+        - name: maps
+          mountPath: /ddnet/maps
       volumes:
         - name: config-volume
           configMap:
@@ -51,3 +65,5 @@ spec:
             items:
             - key: autoexec.cfg
               path: autoexec.cfg
+        - name: maps
+          emptyDir: {}
