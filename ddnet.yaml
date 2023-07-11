@@ -17,6 +17,43 @@ kind: ConfigMap
 metadata:
   name: ddnet-autoexec
 ---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: maps-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: download-maps
+spec:
+  template:
+    spec:
+      containers:
+      - name: get-maps
+        image: busybox:latest
+        command: ["sh", "-c"]
+        args:
+         - wget -O maps.zip
+           "https://github.com/BanBansNet/bbnet-maps/archive/refs/heads/master.zip";
+           unzip maps.zip;
+           mv bbnet-maps-master/*.map /ddnet/maps/
+        volumeMounts:
+        - name: maps
+          mountPath: /ddnet/maps
+      volumes:
+        - name: maps
+          persistentVolumeClaim:
+            claimName: maps-pvc
+      restartPolicy: Never
+  backoffLimit: 4
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -40,21 +77,22 @@ spec:
         ports:
         - containerPort: 8303
           protocol: UDP
-          hostPort: 8304
+          hostPort: 8305
         volumeMounts:
           - name: config-volume
             mountPath: /ddnet/config
           - name: maps
             mountPath: /ddnet/maps
       initContainers:
-      - name: get-maps
+      - name: wait-for-maps
         image: busybox:latest
         command: ["sh", "-c"]
         args:
-         - wget -O maps.zip
-           "https://github.com/BanBansNet/bbnet-maps/archive/refs/heads/master.zip";
-           unzip maps.zip;
-           mv bbnet-maps-master/*.map /ddnet/maps/
+         - while [ ! -f /ddnet/maps/ChillDontKill.map ];
+           do
+             sleep 1;
+             echo "waiting for maps ...";
+           done
         volumeMounts:
         - name: maps
           mountPath: /ddnet/maps
@@ -66,4 +104,5 @@ spec:
             - key: autoexec.cfg
               path: autoexec.cfg
         - name: maps
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: maps-pvc
